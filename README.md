@@ -179,6 +179,27 @@ sample request:
 ```json
 GET /books?page=1
 ```
+sample response:
+```json
+{
+    "success": True,
+    "books": [
+      {
+        "id": 1,
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "rating": 5,
+    },
+    {
+        "id": 2,
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "rating": 5,
+    }
+   
+    ]
+}
+``
 
 ### GET /books/<int:book_id>
 
@@ -203,6 +224,28 @@ POST /books
 {
     "search": "The Great Gatsby",
 }
+sample response:
+```json
+{
+    "success": True,
+    "total_books": 1,
+    "books": [
+      {
+        "id": 1,
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "rating": 5,
+    },
+    {
+        "id": 2,
+        "title": "The Great Gatsby",
+        "author": "F. Scott Fitzgerald",
+        "rating": 5,
+    }
+   
+    ]
+}
+```
 create sample request:
 ```json
 POST /books
