@@ -41,33 +41,59 @@ def create_app(test_config=None):
     
     @app.route("/books")
     def get_all_books():
-        page = request.args.get('page', 1, type=int)
-        start = (page - 1) * BOOKS_PER_SHELF
-        end = start + BOOKS_PER_SHELF
-
-        books = Book.query.all()[start:end]
+        books = paginate_books(request, Book.query.order_by(Book.id).all())
+        if len(books) == 0:
+            abort(404)
+        
         total_books = Book.query.count()
+        print(total_books, books)
         return jsonify({
             'success': True,
-            'books': [book.format() for book in books],
+            'books': [book for book in books],
             'total_books': total_books
         })
+    @app.route("/books/<int:id>", methods=['GET'])
+    def get_book_by_id(id):
+        book = Book.query.get(id)
+        if book is None:
+            abort(404)
+
+        return jsonify({
+            'success': True,
+            'book': book.format()
+        })
+        
     @app.route("/books/<int:book_id>", methods=['PATCH'])
-    def update_book_rating(book_id, rating):
+    def update_book_rating(book_id):
             try:
+                body =request.get_json()
+                print(body)
+                if body is None:
+                    abort(400)
                 book = Book.query.get(book_id)
-                book.rating = rating
+                if book is None:
+                    abort(404)
+                if 'rating' in body:
+                    book.rating = int(body.get('rating'))
+                if 'author' in body:
+                    book.author = body.get('author')
+                if 'title' in body:
+                    book.title = body.get('title')
                 book.update()
+                print(book.format())
                 return jsonify({
                     'success': True
                 })
             except:
-                abort(404)
+                abort(400)
     
     @app.route("/books/<int:book_id>", methods=['DELETE'])
     def delete_book(book_id):
         try:
+            
             book = Book.query.get(book_id)
+            if book is None:
+                abort(422)
             book.delete()
             return jsonify({
                 'success': True,
@@ -110,6 +136,13 @@ def create_app(test_config=None):
         "error": 422,
         "message": "unprocessable"
         }), 422
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+        "success": False, 
+        "error": 400,
+        "message": "bad request"
+        }), 400
         
     @app.errorhandler(403)
     def bad_request(error):
