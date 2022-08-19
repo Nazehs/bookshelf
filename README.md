@@ -276,3 +276,12 @@ sample request:
 ```json
 DELETE /books/1
 ```
+
+## Deployment N/A
+
+## Author
+Nazeh Abel
+
+## Acknoledgements N/A
+
+## References / Further Reading N/A
