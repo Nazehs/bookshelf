@@ -1,4 +1,5 @@
 import os
+from re import search
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy  # , or_
 from flask_cors import CORS
@@ -41,12 +42,13 @@ def create_app(test_config=None):
     
     @app.route("/books")
     def get_all_books():
+        
         books = paginate_books(request, Book.query.order_by(Book.id).all())
+        
         if len(books) == 0:
             abort(404)
         
         total_books = Book.query.count()
-        print(total_books, books)
         return jsonify({
             'success': True,
             'books': [book for book in books],
@@ -110,14 +112,27 @@ def create_app(test_config=None):
                     title = request.json.get('title', None)
                     author = request.json.get('author', None)
                     rating = request.json.get('rating', None)
-                    book = Book(title=title, author=author, rating=rating)
-                    book.insert()
-                    return jsonify({
-                        'success': True,
-                        'created': book.id,
-                        'books': [book.format() for book in Book.query.all()],
-                        'total_books': Book.query.count()
-                    })
+                    search_term = request.json.get('search', None)
+                    print(search_term)
+                    
+                    if search_term:
+                        books =paginate_books(request, Book.query.filter(Book.title.ilike('%{}%'.format(search_term))).all())
+                        return jsonify({
+                            'success': True,
+                            'books': books,
+                            'total_books': len(books)
+                        })
+                    else:
+                        book = Book(title=title, author=author, rating=rating)
+                        book.insert()
+                        books = paginate_books(request, Book.query.order_by(Book.id).all())
+                        
+                        return jsonify({
+                            'success': True,
+                            'created': book.id,
+                            'books': [book.format() for book in Book.query.all()],
+                            'total_books': Book.query.count()
+                        })
             except Exception as e:
                 abort(422)
             

@@ -94,12 +94,20 @@ class BookshelfTestCase(unittest.TestCase):
         self.assertEqual(res.json['success'], False)
         self.assertEqual(res.json['message'], 'Not found')
         
-    # def test_404_sent_requesting_beyond_valid_page(self):
-    #     data = self.client().get('/books?page=1')
-    #     self.assertEqual(data.status_code, 404)
-    #     self.assertEqual(data.content_type, 'application/json')
-    #     self.assertEqual(data.json['success'], False)
-    #     self.assertEqual(data.json['message'], 'Not found')
+    def test_get_search_results(self):
+        """Test get search results"""
+        res = self.client().post('/books', json={'search': 'test'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json['success'], True)
+        self.assertTrue(len(res.json['books']))
+    def test_get_search_results_empty(self):
+        """Test get search results"""
+        res = self.client().post('/books', json={'search': 'nothing'})
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['total_books'],0)
+        self.assertEqual(len(data['total_books']),0)
         
 # Make the tests conveniently executable
 if __name__ == "__main__":
