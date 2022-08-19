@@ -142,3 +142,94 @@ createdb bookshelf_test
 psql bookshelf_test < books.psql
 python test_flaskr.py
 ```
+
+## Documentation
+ 
+### Error Handling
+all the errors are return as JSON objects with the following structure:
+
+```json
+{
+    "success":False,
+    "message": "message",
+    "error": 400
+    }
+```
+Error Status codes:
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 405: Method Not Allowed
+- 409: Conflict
+- 500: Internal Server Error
+- 503: Service Unavailable
+- 429: Too Many Requests
+- 502: Bad Gateway
+- 422: Unprocessable Entity
+
+## Endpoints
+
+### GET /books
+- Returns a list of all books
+- result is paginated (10 books per page)
+- has a `page` query parameter to specify the page number
+
+sample request:
+```json
+GET /books?page=1
+```
+
+### GET /books/<int:book_id>
+
+- Returns a single book
+
+sample request:
+
+```json
+GET /books/1
+```
+### POST /books
+- Creates a new book
+- Requires the `title` and `author` query parameters
+- Returns the newly created book
+- Returns a 400 error if the `title` or `author` query parameters are not provided
+- accepts a search query parameter to search for books by title
+
+search sample request:
+```json
+POST /books
+
+{
+    "search": "The Great Gatsby",
+}
+create sample request:
+```json
+POST /books
+{
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "rating": 5
+}
+### PUT /books/<int:book_id>
+- Updates a book
+- Accepts the `title` and `author` and `rating` 
+- Returns the updated book
+sample request:
+```json
+PUT /books/1
+{
+    "title": "The Great Gatsby",
+    "author": "F. Scott Fitzgerald",
+    "rating": 5
+}
+```
+
+### DELETE /books/<int:book_id>
+
+- Deletes a book
+- Returns a 204 status code if successful
+sample request:
+```json
+DELETE /books/1
+```
